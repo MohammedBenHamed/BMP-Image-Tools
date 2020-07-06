@@ -1,59 +1,82 @@
 #include "Img.h"
-Img::Img(int xSize, int ySize)
+Img::Img(unsigned int xSize, unsigned int ySize, Pixel p)
 {
-    if (xSize<=0 || ySize<=0)
+    // remember to handle bad_alloc exceptions
+    if (xSize == 0 || ySize == 0) throw InvalidCoordinate();
+    this->xSize = xSize;
+    this->ySize = ySize;
+    PixelMap pixelmap;
+    for (unsigned int y_ = 0; y_ < ySize; y_++)
     {
-        throw InvalidCoordinate();
+        for (unsigned int x_ = 0; x_ < xSize; x_++)
+        {
+            pixelmap.push_back(p);
+        }
+    }
+    this->pixelmap = pixelmap;
+}
+
+Img::Img(unsigned int xSize, unsigned int ySize, PixelMap pixelmap)
+{
+    if (xSize == 0 || ySize == 0) throw InvalidCoordinate();
+    if (pixelmap.size() != xSize*ySize)
+    {
+        throw IncompletePixelMap(); // There must be an adequate amount of pixels in the PixelMap
     }
     this->xSize = xSize;
     this->ySize = ySize;
+    this->pixelmap = pixelmap;
 }
-Pixel& Img::getPixel(int x, int y)
+
+Pixel Img::getPixel(unsigned int x, unsigned int y) const
 {
-    if (!correctSize()) throw IncompletePixelMap();
     if (x>=xSize || y>=ySize || x<0 || y<0)
     {
         throw InvalidCoordinate();
     }
     return pixelmap.at(x+y*xSize);
 }
-void Img::addPixel(Pixel p)
+
+void Img::setPixel(unsigned int x, unsigned y, Pixel pixel)
 {
-    pixelmap.push_back(p);
+    if (x>=xSize || y>=ySize || x<0 || y<0)
+    {
+        throw InvalidCoordinate();
+    }
+    pixelmap.at(x+y*xSize) = pixel;
 }
-void Img::changePixel(int x, int y, Pixel p)
-{
-    getPixel(x,y) = p;
-}
-bool Img::correctSize()
-{
-    return ((int)pixelmap.size() == xSize * ySize);
-}
-bool Img::isEmpty()
-{
-    return (pixelmap.size() == 0);
-}
-int Img::getXSize()
+
+
+
+
+
+unsigned int Img::getXSize() const
 {
     return xSize;
 }
-int Img::getYSize()
+unsigned int Img::getYSize() const
 {
     return ySize;
 }
-void Img::setXSize(int xSize)
+
+
+
+
+std::ostream& operator<< (std::ostream &out,  const Img &img)
 {
-    this->xSize = xSize;
+    out << "xSize: " << img.getXSize() << " ySize: " << img.getYSize();
+    out << "\n[\n";
+    for (unsigned int y_ = 0; y_<img.getYSize(); y_++)
+    {
+        for(unsigned int x_ = 0; x_<img.getXSize(); x_++)
+        {
+            out << img.getPixel(x_,y_);
+            if (!(x_==img.getXSize()-1 && y_==img.getYSize()-1)) // print commas until last coordinate
+            out << ", ";
+        }
+        out << "\n";
+    }
+     out << "]";
+    return out; // return std::ostream so we can chain calls to operator <<
 }
-void Img::setYSize(int ySize)
-{
-    this->ySize = ySize;
-}
-PixelMap& Img::getPixelMap()
-{
-    return pixelmap;
-}
-void Img::setPixelMap(PixelMap pixelmap)
-{
-    this->pixelmap = pixelmap;
-}
+

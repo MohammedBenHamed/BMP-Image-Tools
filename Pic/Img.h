@@ -1,28 +1,24 @@
 #ifndef IMG_H
 #define IMG_H
 #include "Pixel.h"
-#include "../Exception/InvalidCoordinate.h"
 #include "../Exception/IncompletePixelMap.h"
-//#include "../Exception/InvalidByte.h"
+#include "../Exception/InvalidCoordinate.h"
 #include <vector>
 using PixelMap = std::vector<Pixel>;
 class Img
 {
     private:
-    int xSize, ySize;
+    unsigned int xSize, ySize;
     PixelMap pixelmap;
     public:
-    Img(int xSize, int ySize);
-    Pixel& getPixel(int x, int y);
-    void addPixel(Pixel p);
-    void changePixel(int x, int y, Pixel p);
-    bool correctSize();
-    bool isEmpty();
-    int getXSize();
-    int getYSize();
-    void setXSize(int xSize);
-    void setYSize(int ySize);
-    PixelMap& getPixelMap();
-    void setPixelMap(PixelMap pixelmap);
+    Img(unsigned int xSize, const unsigned int ySize, Pixel p);
+    Img(unsigned int xSize, const unsigned int ySize, PixelMap pixelmap);
+    Pixel getPixel(unsigned int x, unsigned int y) const;
+    void setPixel(unsigned int x, unsigned y, Pixel pixel);
+    unsigned int getXSize() const;
+    unsigned int getYSize() const;
 };
+
+std::ostream& operator<< (std::ostream &out, const Img &img);
+
 #endif // IMG_H
